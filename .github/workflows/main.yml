@@ -12,35 +12,35 @@ jobs:
       - name: Lấy mã nguồn
         uses: actions/checkout@v4
 
-      - name: San phẳng Entitlements và Signing
+      - name: Giải phẫu bằng Ruby (Nâng cấp iOS & Tắt Chứng chỉ)
         run: |
-          # Dùng lệnh sed để "cạo" sạch các quyền đặc biệt và chứng chỉ kẹt trong file gốc
-          find . -name "*.pbxproj" -exec sed -i '' 's/CODE_SIGN_ENTITLEMENTS = .*/CODE_SIGN_ENTITLEMENTS = "";/g' {} +
-          find . -name "*.pbxproj" -exec sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' {} +
-          find . -name "*.pbxproj" -exec sed -i '' 's/DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = "";/g' {} +
+          ruby -e "
+          require 'xcodeproj'
+          project = Xcodeproj::Project.open('PWAShell.xcodeproj')
+          project.targets.each do |target|
+            target.build_configurations.each do |config|
+              config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+              config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+              config.build_settings['CODE_SIGN_IDENTITY'] = ''
+              config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+            end
+          end
+          project.save
+          "
 
-      - name: Nấu File IPA (Bỏ qua mọi rào cản)
+      - name: Nấu File IPA (Siêu mượt)
         run: |
-          # Tự động tìm tên dự án
-          PROJECT_FILE=$(ls | grep \.xcodeproj | head -n 1)
-          SCHEME_NAME=$(xcodebuild -list -project "$PROJECT_FILE" | grep -A 1 "Schemes:" | tail -n 1 | awk '{$1=$1};1')
-          
-          # Ép Xcode build cho iPhone thực tế mà không cần ký
           xcodebuild clean build \
-            -project "$PROJECT_FILE" \
-            -scheme "$SCHEME_NAME" \
+            -project PWAShell.xcodeproj \
+            -scheme PWAShell \
             -configuration Release \
             -sdk iphoneos \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            ENTITLEMENTS_REQUIRED=NO \
+            -arch arm64 \
             SYMROOT=$PWD/build
 
-      - name: Đóng gói thành file .ipa
+      - name: Đóng gói thành .ipa
         run: |
           mkdir -p Payload
-          # Tìm file .app vừa nấu xong và nhét vào Payload
           mv build/Release-iphoneos/*.app Payload/
           zip -r IPAVIET_Store.ipa Payload
 
