@@ -6,41 +6,41 @@ on:
 jobs:
   build:
     name: Build iOS App
-    runs-on: macos-latest
+    runs-on: macos-14
     
     steps:
       - name: Lấy mã nguồn
         uses: actions/checkout@v4
 
-      - name: Lùng sục và Đóng gói (Auto-Detect)
+      - name: Trảm Bức tường lửa Apple (Xóa Team ID & Signing)
         run: |
-          # 1. Tự động tìm tên Project và Scheme (Chống lỗi sai tên Exit code 66)
+          # Ép xóa mọi chứng chỉ cũ bị kẹt trong file dự án của tác giả
+          find . -name "project.pbxproj" -exec sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' {} +
+          find . -name "project.pbxproj" -exec sed -i '' 's/DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = "";/g' {} +
+
+      - name: Nấu File IPA (Bypass Signing)
+        run: |
           PROJECT_FILE=$(ls | grep \.xcodeproj | head -n 1)
           SCHEME_NAME=$(xcodebuild -list -project "$PROJECT_FILE" | grep -A 1 "Schemes:" | tail -n 1 | awk '{$1=$1};1')
           
-          echo "🎯 Đã tìm thấy Project: $PROJECT_FILE"
-          echo "🎯 Đã tìm thấy Scheme: $SCHEME_NAME"
-          
-          # 2. Ép máy chủ Apple Build không cần chứng chỉ
           xcodebuild clean build \
             -project "$PROJECT_FILE" \
             -scheme "$SCHEME_NAME" \
             -configuration Release \
             -sdk iphoneos \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED="NO" \
-            CODE_SIGNING_ALLOWED="NO" \
-            CODE_SIGN_ENTITLEMENTS="" \
-            PROVISIONING_PROFILE_SPECIFIER="" \
-            SYMROOT=$PWD/build
-            
-          # 3. Nén thành file .ipa
+            -derivedDataPath build_output \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Đóng gói thành file .ipa
+        run: |
           mkdir -p Payload
-          mv build/Release-iphoneos/*.app Payload/
+          mv build_output/Build/Products/Release-iphoneos/*.app Payload/
           zip -r IPAVIET_Store.ipa Payload
 
-      - name: Nhả file IPA cho Sếp
+      - name: Giao hàng cho Sếp
         uses: actions/upload-artifact@v4
         with:
-          name: IPAVIET_App_V1
+          name: IPAVIET_App_Final
           path: IPAVIET_Store.ipa
