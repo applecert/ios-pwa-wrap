@@ -15,7 +15,7 @@ struct Cookie {
 
 let gcmMessageIDKey = "87336923954"
 
-let rootUrl = URL(string: "https://khmyznikov.com/ios-pwa-shell/")!
+let rootUrl = URL(string: "https://ipaviet.site")!
 
 // rootUrl should be in allowedOrigins. allowedOrigins + authOrigins <= 10 domains max.
 // All domains should be in WKAppBoundDomains list
