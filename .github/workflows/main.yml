@@ -12,30 +12,27 @@ jobs:
       - name: Lấy mã nguồn
         uses: actions/checkout@v4
 
-      - name: Lừa Apple & Nấu File IPA
+      - name: Ép Archive (Hủy diệt mọi rào cản chứng chỉ)
         run: |
           PROJECT_FILE=$(ls | grep \.xcodeproj | head -n 1)
           SCHEME_NAME=$(xcodebuild -list -project "$PROJECT_FILE" | grep -A 1 "Schemes:" | tail -n 1 | awk '{$1=$1};1')
           
-          # Dùng dấu "-" để lừa Apple là đã ký chứng chỉ (Ad-Hoc Bypass)
-          xcodebuild clean build \
+          # Sử dụng lệnh Archive để ép Xcode đóng gói thô
+          xcodebuild archive \
             -project "$PROJECT_FILE" \
             -scheme "$SCHEME_NAME" \
-            -configuration Release \
+            -archivePath $PWD/build/IPAVIET.xcarchive \
             -sdk iphoneos \
-            -arch arm64 \
-            CODE_SIGN_IDENTITY="-" \
-            EXPANDED_CODE_SIGN_IDENTITY="-" \
-            CODE_SIGNING_REQUIRED=YES \
-            CODE_SIGNING_ALLOWED=YES \
-            DEVELOPMENT_TEAM="" \
-            PROVISIONING_PROFILE_SPECIFIER="" \
-            SYMROOT=$PWD/build
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES
 
-      - name: Đóng gói thành file .ipa
+      - name: Trích xuất và Tạo file .ipa
         run: |
           mkdir -p Payload
-          mv build/Release-iphoneos/*.app Payload/
+          # Nhặt file .app từ trong bản Archive ra
+          cp -r build/IPAVIET.xcarchive/Products/Applications/*.app Payload/
           zip -r IPAVIET_Store.ipa Payload
 
       - name: Giao hàng cho Sếp
