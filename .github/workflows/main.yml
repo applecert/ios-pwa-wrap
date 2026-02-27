@@ -1,0 +1,29 @@
+name: Build IPAVIET App
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Nấu File IPA
+    runs-on: macos-latest
+    
+    steps:
+      - name: Lấy mã nguồn
+        uses: actions/checkout@v3
+
+      - name: Biên dịch App (Bỏ qua chứng chỉ Apple)
+        run: |
+          # Ép máy chủ Mac biên dịch không cần chứng chỉ
+          xcodebuild build -project pwashell.xcodeproj -scheme pwashell -configuration Release -arch arm64 CODE_SIGNING_ALLOWED=NO SYMROOT=$PWD/build
+          
+          # Đóng gói thành file .ipa
+          mkdir -p Payload
+          mv build/Release-iphoneos/*.app Payload/
+          zip -r IPAVIET.ipa Payload
+
+      - name: Trả file cho Sếp
+        uses: actions/upload-artifact@v3
+        with:
+          name: IPAVIET_Store
+          path: IPAVIET.ipa
