@@ -4,20 +4,24 @@
 <dict>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>$(PRODUCT_BUNDLE_IDENTIFIER). processing</string>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).processing</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+
 	<key>CFBundleDisplayName</key>
-	<string>PWAShell</string>
+	<string>IPAVIET</string>
+
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+
 	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
+	<string>IPAVIET</string>
+
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
@@ -28,10 +32,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>CFBundleURLName</key>
-			<string>com.pwa.shell</string>
+			<string>com.ipaviet.app</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>pwashell</string>
+				<string>ipaviet</string>
 			</array>
 		</dict>
 	</array>
@@ -47,11 +51,11 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Capture Video by user request</string>
+	<string>Cho phép truy cập máy ảnh</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Track current location by user request</string>
+	<string>Cho phép truy cập vị trí</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Capture Audio by user request</string>
+	<string>Cho phép truy cập micro</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -103,13 +107,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+
 	<key>WKAppBoundDomains</key>
 	<array>
-		<string>khmyznikov.com</string>
-		<string>localhost</string>
-		<string>whatpwacando.today</string>
-		<string>whatwebcando.today</string>
-		<string>tomayac.github.io</string>
+		<string>ipaviet.site</string>
 	</array>
 </dict>
 </plist>
