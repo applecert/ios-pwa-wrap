@@ -12,16 +12,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set Xcode Version
-        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
-
       - name: Build and Package
         run: |
-          # 1. Ép Build không cần chứng chỉ Apple
+          # 1. Ép Build không cần chứng chỉ Apple, nhắm thẳng vào iPhone
           xcodebuild clean build \
-            -project ios-pwa-wrap.xcodeproj \
-            -scheme ios-pwa-wrap \
+            -project PWAShell.xcodeproj \
+            -scheme PWAShell \
             -configuration Release \
+            -sdk iphoneos \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
