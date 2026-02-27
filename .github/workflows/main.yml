@@ -5,25 +5,35 @@ on:
 
 jobs:
   build:
-    name: Nấu File IPA
-    runs-on: macos-latest
+    name: Build iOS App
+    runs-on: macos-13
     
     steps:
-      - name: Lấy mã nguồn
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Biên dịch App (Bỏ qua chứng chỉ Apple)
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_14.3.1.app/Contents/Developer
+
+      - name: Build and Package
         run: |
-          # Ép máy chủ Mac biên dịch không cần chứng chỉ
-          xcodebuild build -project pwashell.xcodeproj -scheme pwashell -configuration Release -arch arm64 CODE_SIGNING_ALLOWED=NO SYMROOT=$PWD/build
-          
-          # Đóng gói thành file .ipa
+          # 1. Ép Build không cần chứng chỉ Apple
+          xcodebuild clean build \
+            -project ios-pwa-wrap.xcodeproj \
+            -scheme ios-pwa-wrap \
+            -configuration Release \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            SYMROOT=$PWD/build
+
+          # 2. Đóng gói thành file IPA
           mkdir -p Payload
           mv build/Release-iphoneos/*.app Payload/
-          zip -r IPAVIET.ipa Payload
+          zip -r IPAVIET_Store.ipa Payload
 
-      - name: Trả file cho Sếp
+      - name: Upload IPA Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: IPAVIET_Store
-          path: IPAVIET.ipa
+          name: IPAVIET_App_V1
+          path: IPAVIET_Store.ipa
